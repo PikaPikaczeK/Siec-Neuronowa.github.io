@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Neural Network Simulation</title>
+</head>
+<body>
+<script>
+
+    const liczba_neuronow = 3; // Liczba neuronów w warstwie wejściowej
+    const liczba_ukrytych = 4;  // Liczba neuronów w każdej warstwie ukrytej
+
+    // Funkcja aktywacji
+    function fSigmoidalna(wejsciowa) {
+        return 1 / (1 + Math.exp(-wejsciowa));
+    }
+
+    function sumaWazona(N, waga, sygnal, bias) {
+        let suma = 0;
+        for (let i = 0; i < N; i++) {
+            suma += waga[i] * sygnal[i];
+        }
+        return suma + bias;
+    }
+
+    function losujZPrzedzialu(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    let wagi = [];
+    let sygnaly = [];
+    let bias = [];
+
+    // Inicjalizacja wag, sygnałów i biasu dla warstwy wejściowej
+    for (let i = 0; i < liczba_neuronow; i++) {
+        wagi[i] = losujZPrzedzialu(-0.5, 0.5);
+        sygnaly[i] = losujZPrzedzialu(-0.5, 0.5);
+        bias[i] = losujZPrzedzialu(-0.5, 0.5);
+    }
+
+
+    // Wyświetlenie aktywacji neuronów w warstwie wejściowej
+    for (let i = 0; i < liczba_neuronow; i++) {
+        sygnaly[i] = fSigmoidalna(sumaWazona(liczba_neuronow, wagi, sygnaly, bias[i]))
+        //console.log(`Neuron ${i}: ${fSigmoidalna(sumaWazona(liczba_neuronow, wagi, sygnaly, bias[i]))}`);
+    }
+
+    let sygnaly_ukryte_1 = [];
+    let wagi_ukryte = [];
+    let bias_ukryte = [];
+
+    // Inicjalizacja wag i biasu dla pierwszej warstwy ukrytej
+    for (let j = 0; j < liczba_ukrytych; j++) {
+        wagi_ukryte[j] = [];
+        for (let k = 0; k < liczba_neuronow; k++) {
+            wagi_ukryte[j][k] = losujZPrzedzialu(-0.5, 0.5);
+        }
+        bias_ukryte[j] = losujZPrzedzialu(-0.5, 0.5);
+    }
+
+    // Aktywacja neuronów w pierwszej warstwie ukrytej
+    for (let i = 0; i < liczba_ukrytych; i++) {
+        sygnaly_ukryte_1[i] = fSigmoidalna(sumaWazona(liczba_neuronow, wagi_ukryte[i], sygnaly, bias_ukryte[i]));
+        //console.log(`Aktywacja dla 1 warstwy ukrytej neuronu ${i + 1}: ${sygnaly_ukryte_1[i]}`);
+    }
+
+    let sygnaly_ukryte_2 = [];
+    let wagi_ukryte_2 = [];
+    let bias_ukryte_2 = [];
+
+    // Inicjalizacja wag i biasu dla drugiej warstwy ukrytej
+    for (let j = 0; j < liczba_ukrytych; j++) {
+        wagi_ukryte_2[j] = [];
+        for (let k = 0; k < liczba_ukrytych; k++) {
+            wagi_ukryte_2[j][k] = losujZPrzedzialu(-0.5, 0.5);
+        }
+        bias_ukryte_2[j] = losujZPrzedzialu(-0.5, 0.5);
+    }
+
+    // Aktywacja neuronów w drugiej warstwie ukrytej
+    for (let i = 0; i < liczba_ukrytych; i++) {
+        sygnaly_ukryte_2[i] = fSigmoidalna(sumaWazona(liczba_ukrytych, wagi_ukryte_2[i], sygnaly_ukryte_1, bias_ukryte_2[i]));
+        //console.log(`Aktywacja dla 2 warstwy ukrytej neuronu ${i + 1}: ${sygnaly_ukryte_2[i]}`);
+    }
+
+    let sygnaly_wyjsciowe = [];
+    let wagi_wyjsciowe = [];
+    let bias_wyjsciowe = [];
+
+    for(let i = 0; i<liczba_ukrytych; i++){
+        wagi_wyjsciowe[i] = [];
+        for(let j = 0; j<liczba_ukrytych; j++){
+            wagi_wyjsciowe[i][j] = losujZPrzedzialu(-0.5, 0.5);
+        }
+        bias_wyjsciowe[i] = losujZPrzedzialu(-0.5, 0.5);
+    }
+
+    for(let i = 0; i<liczba_ukrytych; i++){
+        sygnaly_wyjsciowe[i] = fSigmoidalna(sumaWazona(liczba_ukrytych, wagi_wyjsciowe[i], sygnaly_ukryte_2, bias_wyjsciowe[i]));
+        if(sygnaly_wyjsciowe[i] > 0.5){
+            console.log(`Aktywowany neuron: ${i+1}, wartosc: ${sygnaly_wyjsciowe[i]}`)
+        }
+    }
+
+</script>
+</body>
+</html>
